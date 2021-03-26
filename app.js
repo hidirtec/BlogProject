@@ -1,33 +1,44 @@
 const http = require('http')
-
-// const querystring = require('querystring')
-
-// const server = http.createServer((req,res)=>{
-//     console.log(req.method)     //GET
-//     const url = req.url   
-//     console.log(url)      
-//     req.query = querystring.parse(url.split('?')[1])
-//     console.log('query: ',req.query)
-//     res.writeHead(200, {'content-type':'text/html'})
-//     res.end(JSON.stringify(req.query))
-// })
-
+const querystring = require('querystring')
 const server = http.createServer((req, res)=>{
-    if (req.method === 'POST'){
-        //get request format
-        console.log('request content type: ',req.headers['content-type'])
-        //receive data
+    const method = req.method
+    const url = req.url
+    const path = url.split('?')[0]
+    const query = querystring.parse(url.split('?')[1])
+
+    //set response content-type
+    res.setHeader('Content-type','application/json')
+
+    //response data
+    const resData = {
+        method,
+        url,
+        path,
+        query
+    }
+    
+    //Response
+    if(method ==='GET') {
+        res.end(
+            JSON.stringify(resData)
+        )
+    }
+
+    if(method === 'POST'){
         let postData = ''
-        req.on('data',chunk => {
+        req.on('data', chunk=>{
             postData += chunk.toString()
         })
-        req.on('end',() =>{
-            console.log('postData: ',postData)
-            res.end('Hello World')
+        req.on('end', () => {
+            resData.postData = postData
+            res.end(
+                JSON.stringify(resData)
+            )
         })
     }
+
 })
 
 server.listen(3000, ()=>{
-    console.log('listening on port 3000')
+    console.log('Listening on port 3000')
 })
