@@ -1,44 +1,33 @@
-const http = require('http')
-const querystring = require('querystring')
-const server = http.createServer((req, res)=>{
-    const method = req.method
-    const url = req.url
-    const path = url.split('?')[0]
-    const query = querystring.parse(url.split('?')[1])
+const handleBlogRouter = require('./src/router/blog')
+const handleUserRouter = require('./src/router/user')
 
-    //set response content-type
+const serverHandle = (req, res) => {
     res.setHeader('Content-type','application/json')
-
-    //response data
-    const resData = {
-        method,
-        url,
-        path,
-        query
-    }
     
-    //Response
-    if(method ==='GET') {
+    req.path = req.url.split('?')[0]
+
+    // handle blog routes
+    const blogData = handleBlogRouter(req , res)
+    if (blogData) {
         res.end(
-            JSON.stringify(resData)
+            JSON.stringify(blogData)
         )
+        return
     }
 
-    if(method === 'POST'){
-        let postData = ''
-        req.on('data', chunk=>{
-            postData += chunk.toString()
-        })
-        req.on('end', () => {
-            resData.postData = postData
-            res.end(
-                JSON.stringify(resData)
-            )
-        })
+    // handle user routes
+    const userData = handleUserRouter(req, res)
+    if (blogData) {
+        res.end(
+            JSON.stringify(blogData)
+        )
+        return
     }
 
-})
+    // handle 404 error
+    res.writeHead(404, {"Content-type":"text/plain"})
+    res.write("404 Not Found \n")
+    res.end()
+}
 
-server.listen(3000, ()=>{
-    console.log('Listening on port 3000')
-})
+module.exports = serverHandle
