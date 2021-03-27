@@ -1,17 +1,22 @@
+const { getList, getDetail } = require('../controller/blog')
+const { SuccessModel, ErrorModel } = require('../model/resModel')
+
 const handleBlogRouter = (req, res) => {
 
     // Get list of blog posts
     if(req.method === 'GET' && req.path === '/api/blog/list' ) {
-        return {
-            msg : 'This API returns the list of blog posts'
-        }
+        const author = req.query.author || ''
+        const keyword = req.query.keyword || ''
+        const listData = getList(author, keyword)
+        
+        return new SuccessModel(listData)
     }
 
     // Get details of blog
     if(req.method === 'GET' && req.path === '/api/blog/detail') {
-        return {
-            msg: 'This API returns the details of blog posts'
-        }
+        const id = req.query.id
+        const detailData = getDetail(id)
+        return new SuccessModel(detailData)
     }
 
     // Create a new blog post
