@@ -29,7 +29,28 @@ const getDetail = (id) => {
     }
 }
 
+const newBlog = (blogData = {}) => {
+    // blogData is a blog object that comprises of the title, content and attributes
+    return {
+        id: 3 // represents the id of the new blog post
+    }
+}
+
+const updateBlog = (id, blogData = {}) => {
+    // blogData is a blog object that comprises of the title, content and attributes
+    // id refers to the id of the blog to update
+    return true
+}
+
+const delBlog = (id) => {
+    //id refers to the id number of blogpost to be deleted
+    return true
+}
+
 module.exports = {
     getList,
-    getDetail
+    getDetail,
+    newBlog,
+    updateBlog,
+    delBlog
 }
