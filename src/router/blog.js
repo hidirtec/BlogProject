@@ -15,42 +15,53 @@ const handleBlogRouter = (req, res) => {
     if(req.method === 'GET' && req.path === '/api/blog/list' ) {
         const author = req.query.author || ''
         const keyword = req.query.keyword || ''
-        const listData = getList(author, keyword)
-        
-        return new SuccessModel(listData)
+        const result = getList(author, keyword)
+        return result.then(listData => {
+            return new SuccessModel(listData)
+        } )
     }
 
     // Get details of blog
     if(req.method === 'GET' && req.path === '/api/blog/detail') {
-        const detailData = getDetail(id)
-        return new SuccessModel(detailData)
+        const result = getDetail(id)
+        return result.then(data => {
+            return new SuccessModel(data)
+        })
     }
 
     // Create a new blog post
     if(req.method === 'POST' && req.path === '/api/blog/new' ){
-        const newBlogData = newBlog(req.body)
-        return new SuccessModel(newBlogData)
-        
+        req.body.author = 'Collin Foo' //fake data to be replaced after adding Log In functions
+        const result = newBlog(req.body)
+        return result.then( data => {
+            return new SuccessModel(data)
+        })
     }
 
     // Update a blog post
     if(req.method === 'POST' && req.path === '/api/blog/update') {
         const result = updateBlog(id, req.body)
-        if (result) {
-            return new SuccessModel()
-        } else {
-            return new ErrorModel('Error occurred while updating blogpost')
-        }
+        return result.then( Success => {
+            if (Success) {
+                return new SuccessModel()
+            } else {
+                return new ErrorModel('Error occurred while updating blogpost')
+            }
+        })
+
     }
 
     //Delete a blog post
     if(req.method === 'POST' && req.path === '/api/blog/del' ) {
-        const result = delBlog(id)
-        if (result) {
-            return new SuccessModel
-        } else {
-            return new ErrorModel('Error occurred while deleting blogpost')
-        }
+        const author = 'Collin Foo' //fake data to be replaced after adding Log In functions
+        const result = delBlog(id, author)
+        return result.then(Deleted => {
+            if ( Deleted ) {
+                return new SuccessModel
+            } else {
+                return new ErrorModel('Error occurred while deleting blogpost')
+            }
+        })
     }
 }
 

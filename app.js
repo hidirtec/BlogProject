@@ -42,23 +42,29 @@ const serverHandle = (req, res) => {
     getPostData(req).then(postData => {
         req.body = postData
 
-        // handle blog routes
-        const blogData = handleBlogRouter(req , res)
-        if (blogData) {
-            res.end(
-                JSON.stringify(blogData)
-            )
-            return
+        //handle blog routes
+        const blogResult = handleBlogRouter(req, res)
+        if (blogResult) {
+            blogResult.then(blogData => {
+                res.end(
+                    JSON.stringify(blogData)
+                )
+             })
+        return
         }
+        
 
         // handle user routes
-        const userData = handleUserRouter(req, res)
-        if (userData) {
-            res.end(
-                JSON.stringify(userData)
-            )
+        const userResult = handleUserRouter(req, res)
+        if (userResult) {
+            userResult.then(userData => {
+                res.end(
+                    JSON.stringify(userData)
+                )
+            })
             return
-        }
+        }       
+        
 
         // handle 404 error
         res.writeHead(404, {"Content-type":"text/plain"})

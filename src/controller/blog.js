@@ -1,50 +1,72 @@
+const { exec } = require('../db/mysql')
+
 const getList = (author, keyword) => {
-    //returns fake list for testing
-    return [
-        {
-            id: 1,
-            title: 'Title 1',
-            content: 'Content 1',
-            createTime: 1616835510521,
-            author: 'Author 1'
-        },
-        {
-            id: 2,
-            title: 'Title 2',
-            content: 'Content 2',
-            createTime: 1616835752523,
-            author: 'Aurthor 2'
-        }
-    ]
+    let sql = `select * from blogs where 1=1 `
+    if (author) {
+        sql += `and author like '%${author}%' `
+    }
+    if (keyword) {
+        sql += `and title like '%${keyword}%' `
+    }
+    sql += `order by createtime desc;`
+
+    //return promise
+    return exec(sql)
 }
 
 const getDetail = (id) => {
-    //returns fake details for testing
-    return {
-        id: 1,
-        title: 'Title 1',
-        content: 'Content 1',
-        createTime: 1616835510521,
-        author: 'Author 1'
-    }
+    let sql = `select * from blogs where id = '${id}'`
+    return exec(sql).then(rows => {
+        return rows[0]
+    })
 }
 
 const newBlog = (blogData = {}) => {
     // blogData is a blog object that comprises of the title, content and attributes
-    return {
-        id: 3 // represents the id of the new blog post
-    }
+    const title = blogData.title
+    const content = blogData.content
+    const createTime = Date.now()
+    const author = blogData.author
+
+    let sql = `
+        insert into blogs (title, content, createtime, author) values ('${title}','${content}',${createTime},'${author}')
+    `
+    return exec(sql).then(insertData => {
+        return {
+            id: insertData.insertId
+        }
+    })
 }
 
 const updateBlog = (id, blogData = {}) => {
-    // blogData is a blog object that comprises of the title, content and attributes
-    // id refers to the id of the blog to update
-    return true
+    const title = blogData.title
+    const content = blogData.content
+    const updateTime = Date.now()
+
+    let sql = `
+        update blogs set title = '${title}', content = '${content}', lastupdatetime = ${updateTime} where id = ${id}
+    `
+
+    return exec(sql).then(updateData => {
+        if (updateData.affectedRows > 0) {
+            return true
+        }
+        return false
+    })
+
 }
 
-const delBlog = (id) => {
-    //id refers to the id number of blogpost to be deleted
-    return true
+const delBlog = (id, author) => {
+    let sql = `
+        update blogs set state = 0 where id = ${id} and author = '${author}'
+    `
+    return exec(sql).then(deleteData => {
+        if (deleteData.affectedRows > 0) {
+            return true
+        }
+        return false
+    })
+
 }
 
 module.exports = {
